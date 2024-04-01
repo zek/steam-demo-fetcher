@@ -67,7 +67,7 @@ Replace `<your_steam_refresh_token>` with your actual Steam refresh token.
 
 ### Running the Server
 
-Execute `node server.js` to start the Express server. By default, it listens on port 3000, but you can change this by setting the `PORT` environment variable in your `.env` file.
+Execute `node server.js` to start the moleculer service. By default, it listens on port 3000, but you can change this by setting the `PORT` environment variable in your `.env` file.
 
 ### Endpoints
 
