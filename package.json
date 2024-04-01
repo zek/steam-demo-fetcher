@@ -1,6 +1,6 @@
 {
   "name": "steam-demo-downloader",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A service for downloading CS2 demo files from Steam.",
   "main": "index.js",
   "scripts": {
