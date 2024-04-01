@@ -1,0 +1,38 @@
+{
+  "name": "steam-demo-downloader",
+  "version": "1.0.0",
+  "description": "A service for downloading CS2 demo files from Steam.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "steam",
+    "demo",
+    "downloader",
+    "counter-strike",
+    "global offensive"
+  ],
+  "author": "Talha Durmus",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "globaloffensive": "^3.1.0",
+    "globaloffensive-sharecode": "^1.1.1",
+    "steam-user": "^5.0.8",
+    "unbzip2-stream": "^1.4.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.2",
+    "jest": "^29.7.0",
+    "typescript": "^5.4.3"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
