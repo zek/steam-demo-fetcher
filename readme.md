@@ -71,8 +71,8 @@ Execute `node server.js` to start the moleculer service. By default, it listens 
 
 ### Endpoints
 
-- `GET /match/:MATCH_TOKEN/download`: Downloads the match replay file for the given `MATCH_TOKEN`.
-- `GET /match/:MATCH_TOKEN`: Retrieves the download URL for the match replay corresponding to the `MATCH_TOKEN`.
+- `GET /match/:matchToken/download`: Downloads the match replay file for the given `matchToken`.
+- `GET /match/:matchToken`: Retrieves the download URL for the match replay corresponding to the `matchToken`.
 
 ## Contributing
 

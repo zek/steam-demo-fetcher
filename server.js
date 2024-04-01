@@ -4,10 +4,17 @@ const ApiService = require('moleculer-web');
 const stream = require('stream');
 const CSGOManager = require('./manager');
 
-const manager = new CSGOManager();
+const transporter = process.env.BROKER_TRANSPORTER;
+const namespace = process.env.BROKER_NAMESPACE;
+const discoverer = process.env.BROKER_DISCOVERER;
 
 const broker = new ServiceBroker({
   logger: console,
+  namespace,
+  transporter,
+  registry: {
+    discoverer,
+  },
 });
 
 broker.createService({
@@ -18,13 +25,13 @@ broker.createService({
     port: process.env.PORT || 3000,
     routes: [
       {
-        path: '/match/:MATCH_TOKEN/download',
+        path: '/match/:matchToken/download',
         aliases: {
           'GET /': 'steam-demo-fetcher.downloadMatch',
         },
       },
       {
-        path: '/match/:MATCH_TOKEN',
+        path: '/match/:matchToken',
         aliases: {
           'GET /': 'steam-demo-fetcher.getMatch',
         },
@@ -33,41 +40,62 @@ broker.createService({
   },
 
   actions: {
-    async downloadMatch(ctx) {
-      const { MATCH_TOKEN } = ctx.params;
-      const remoteUrl = await manager.getMatchURL(MATCH_TOKEN);
 
-      ctx.meta.$responseType = 'application/octet-stream';
-      ctx.meta.$responseHeaders = {
-        'Content-Type': 'application/octet-stream',
-        'Content-Disposition': `attachment; filename=${CSGOManager.generateDemoName(remoteUrl)}`,
-      };
+    downloadMatch: {
+      params: {
+        matchToken: { type: 'string' },
+      },
+      async handler(ctx) {
+        const { matchToken } = ctx.params;
+        const remoteUrl = await this.client.getMatchURL(matchToken);
 
-      const ws = new stream.PassThrough();
+        ctx.meta.$responseType = 'application/octet-stream';
+        ctx.meta.$responseHeaders = {
+          'Content-Type': 'application/octet-stream',
+          'Content-Disposition': `attachment; filename=${CSGOManager.generateDemoName(remoteUrl)}`,
+        };
 
-      CSGOManager.downloadStream(remoteUrl, ws).catch((error) => {
-        this.logger.error('Error streaming file:', error.message);
-        ctx.meta.$statusCode = 500;
-        ctx.meta.$responseHeaders = {};
-        return `Error streaming file: ${error.message}`;
-      });
+        const ws = new stream.PassThrough();
 
-      return ws;
+        CSGOManager.downloadStream(remoteUrl, ws).catch((error) => {
+          this.logger.error('Error streaming file:', error.message);
+          ctx.meta.$statusCode = 500;
+          ctx.meta.$responseHeaders = {};
+          return `Error streaming file: ${error.message}`;
+        });
+
+        return ws;
+      },
     },
 
-    async getMatch(ctx) {
-      const { MATCH_TOKEN } = ctx.params;
-      try {
-        const remoteUrl = await manager.getMatchURL(MATCH_TOKEN);
-        return { url: remoteUrl };
-      } catch (error) {
-        this.logger.error('Error getting match:', error.message);
-        this.logger.error(error);
-        ctx.meta.$statusCode = 500;
-        return `Error getting match: ${error.message}`;
-      }
+    getMatch: {
+      params: {
+        matchToken: { type: 'string' },
+      },
+      async handler(ctx) {
+        const { matchToken } = ctx.params;
+        try {
+          const remoteUrl = await this.client.getMatchURL(matchToken);
+          return { url: remoteUrl };
+        } catch (error) {
+          this.logger.error('Error getting match:', error.message);
+          this.logger.error(error);
+          ctx.meta.$statusCode = 500;
+          return `Error getting match: ${error.message}`;
+        }
+      },
     },
   },
+  created() {
+    this.client = new CSGOManager();
+  },
+  started() {
+    return this.client.authenticate();
+  },
+  stopped() {
+    return this.client.logout();
+  },
+
 });
 
 // Start server

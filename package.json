@@ -21,6 +21,7 @@
     "dotenv": "^16.4.5",
     "globaloffensive": "^3.1.0",
     "globaloffensive-sharecode": "^1.1.1",
+    "ioredis": "^5.3.2",
     "moleculer": "^0.14.32",
     "moleculer-web": "^0.10.7",
     "steam-user": "^5.0.8",
